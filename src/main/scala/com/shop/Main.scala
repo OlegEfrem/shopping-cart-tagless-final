@@ -1,4 +1,4 @@
-package com.example
+package com.shop
 
 import cats.effect.IOApp
 import cats.effect.IO
