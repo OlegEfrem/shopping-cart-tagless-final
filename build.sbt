@@ -19,6 +19,9 @@ lazy val root = (project in file(".")).settings(
     "org.typelevel" %% "munit-cats-effect-3" % "1.0.7" % Test,
     "org.scalameta" %% "munit-scalacheck" % "0.7.29" % Test,
     "com.github.chocpanda" %% "scalacheck-magnolia" % "0.5.1" % Test,
+    "org.typelevel" %% "scalacheck-effect" % "1.0.4" % Test,
+    "org.typelevel" %% "scalacheck-effect-munit" % "1.0.4" % Test,
+
     // Bring in Money type
     "org.typelevel" %% "squants" % "1.8.3",
     // typeclass derivation
