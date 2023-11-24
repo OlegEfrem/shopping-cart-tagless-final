@@ -1,20 +1,18 @@
 package com.shop
 
+import com.shop.TestData._
 import com.shop.config.Config.taxRate
-import com.shop.model.cart.{Cart, CartId, CartTotals, Item, MoneyOps, Quantity}
+import com.shop.model.cart._
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.Tax
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
-import eu.timepit.refined.types.all.NonEmptyString
-import io.estatico.newtype.Coercible
-import io.estatico.newtype.ops._
 import org.scalacheck.{Arbitrary, Gen}
 import squants.Money
 import squants.market.Money
-
 import java.util.UUID
 import scala.language.implicitConversions
+import model.moneyContext
 
 
 object generators {
@@ -54,8 +52,7 @@ object generators {
 
   private val productGen: Gen[ShoppingProduct] = for {
     prodName <- productNameGen
-    price <- moneyGen
-  } yield ShoppingProduct(prodName, price)
+  } yield ShoppingProduct(prodName, productPrices(prodName))
   implicit val productArb: Arbitrary[ShoppingProduct] = Arbitrary(productGen)
 
   private val itemGen: Gen[Item] = for {

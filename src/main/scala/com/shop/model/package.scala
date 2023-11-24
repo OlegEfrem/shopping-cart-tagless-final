@@ -3,7 +3,7 @@ package com.shop
 import cats.{Eq, Monoid, Show}
 import com.shop.config.Config.defaultCurrency
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.types.all.NonNegInt
+import eu.timepit.refined.types.all.{NonNegInt, PosInt}
 import io.circe.{Decoder, Encoder}
 import squants.market.{Currency, Money, MoneyContext}
 import eu.timepit.refined.auto._
@@ -28,11 +28,11 @@ trait OrphanInstances {
       def combine(x: Money, y: Money): Money = x + y
     }
 
-  implicit val posIntMonoid: Monoid[NonNegInt] =
-    new Monoid[NonNegInt] {
-      def empty: NonNegInt = 1
+  implicit val posIntMonoid: Monoid[PosInt] =
+    new Monoid[PosInt] {
+      def empty: PosInt = 1
 
-      def combine(x: NonNegInt, y: NonNegInt): NonNegInt = Refined.unsafeApply(x + y)
+      def combine(x: PosInt, y: PosInt): PosInt = Refined.unsafeApply(x + y)
     }
 
   implicit val currencyEq: Eq[Currency] = Eq.and(Eq.and(Eq.by(_.code), Eq.by(_.symbol)), Eq.by(_.name))

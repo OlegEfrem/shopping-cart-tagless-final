@@ -1,121 +1,154 @@
-package com.shop.service
+package com.shop
+package service
 
 import cats.effect.IO
-import cats.implicits._
+import com.shop.TestData._
 import com.shop.config.Config.taxRate
-import com.shop.model._
+import com.shop.generators._
 import com.shop.model.cart._
 import com.shop.model.error.{CartError, ProductError}
-import com.shop.model.product.{ProductName, ShoppingProduct}
+import com.shop.model.moneyContext
+import com.shop.model.product.ProductName
 import com.shop.model.tax.Tax
-import munit.CatsEffectSuite
-import squants.market.{Money}
-import java.util.UUID
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
+import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
+import org.scalacheck.effect.PropF.forAllF
+import squants.market.Money
 
-class CartServiceTest extends CatsEffectSuite {
-  private def newCartId(id: String) = CartId(UUID.nameUUIDFromBytes(id.getBytes))
-  private val cartId = newCartId("test-cart-id")
-  private val cheeriosProductName = ProductName("cheerios")
-  private val cheeriosPrice = Money(8.43)
-  private val quantityOne = Quantity(0)
-  private val subTotalOneCheerios = cheeriosPrice * quantityOne.value.value
-  private val taxAmountOneCheerios = cheeriosPrice * taxRate.value
-  private val taxOneCheerios = Tax(taxRate, taxAmountOneCheerios)
-  private val cheeriosProduct = ShoppingProduct(cheeriosProductName, cheeriosPrice)
-  private val itemOneCheerios = Item(cheeriosProduct, quantityOne)
-  private val total: Money = subTotalOneCheerios plus taxAmountOneCheerios
-  private val cartTotalsOneCheerios = CartTotals(subTotalOneCheerios, taxOneCheerios, total = total)
-  private val cartOneCheerios = Cart(cartId, items = Map(cheeriosProductName -> itemOneCheerios), totals = cartTotalsOneCheerios)
+import java.util.UUID
 
+class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
 
-  private val cartService = new CartService[IO] {
-    override def createCart(): IO[Cart] = IO.pure(Cart.empty(cartId, taxRate))
+  private def cartService(cart: Cart) = new CartService[IO] {
+    override def createCart(): IO[Cart] = IO.pure(Cart.empty(cart.id, taxRate))
 
-    override def addProduct(cartId: CartId, productName: ProductName, quantity: Quantity): IO[Cart] = IO.pure(cartOneCheerios)
+    override def addProduct(cartId: CartId, productName: ProductName, quantity: Quantity): IO[Cart] = IO.pure(cart)
 
-    override def getCart(cartId: CartId): IO[Cart] = IO.pure(cartOneCheerios)
+    override def getCart(cartId: CartId): IO[Cart] = IO.pure(cart)
   }
-
+  // createCart
   test("New empty cart can be created") {
-    for {
-      cart <- cartService.createCart()
-    } yield assert(cart === Cart.empty(cart.id, taxRate))
+    forAllF { (cart: Cart) =>
+      for {
+        obtainedCart <- cartService(cart).createCart()
+      } yield {
+        val expectedCart = Cart(obtainedCart.id, Map.empty, CartTotals(MoneyOps.zero, Tax(taxRate, MoneyOps.zero), MoneyOps.zero))
+        assertEquals(obtainedCart, expectedCart)
+      }
+    }
   }
 
-  test("Product can be added to the cart by name and quantity") {
-    for {
-      cart <- cartService.createCart()
-      cart <- cartService.addProduct(cart.id, cheeriosProductName, quantityOne)
-    } yield assert(cart.items(cheeriosProductName).quantity === quantityOne)
+  // addProduct
+  test("Product can be added to an empty cart by name and quantity") {
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      for {
+        emptyCart <- cartService(cart).createCart()
+        updatedCart <- cartService(emptyCart).addProduct(emptyCart.id, cheerios, quantity)
+      } yield assertEquals(updatedCart.items(cheerios).quantity, quantity)
+    }
+  }
+
+  test("Product can be added to a non empty cart by name and quantity") {
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      val item = cart.items.head._2
+      val productName = item.product.name
+      val originalQuantity = item.quantity
+      val expectedQuantity = Quantity(Refined.unsafeApply(originalQuantity.value + quantity.value))
+      val nonEmptyCart = cartService(cart)
+      for {
+        result <- nonEmptyCart.addProduct(cart.id, productName, quantity)
+      } yield {
+        val obtainedQuantity = result.items(productName).quantity
+        assertEquals(obtainedQuantity, expectedQuantity)
+      }
+    }
   }
 
   test("Product price should be found by product name") {
-
-    val quantity = Quantity(1)
-    for {
-      cart <- cartService.createCart()
-      updatedCart <- cartService.addProduct(cart.id, cheeriosProductName, quantityOne)
-    } yield assert(updatedCart.items(cheeriosProductName).product.price === cheeriosPrice)
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      for {
+        emptyCart <- cartService(cart).createCart()
+        updatedCart <- cartService(emptyCart).addProduct(emptyCart.id, cheerios, quantity)
+      } yield assertEquals(updatedCart.items(cheerios).product.price, productPrices(cheerios))
+    }
   }
 
   test("Cart state must be available upon adding a product") {
-
-    for {
-      cart <- cartService.createCart()
-      updatedCart <- cartService.addProduct(cart.id, cheeriosProductName, quantityOne)
-    } yield assert(updatedCart === cartOneCheerios)
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      for {
+        emptyCart <- cartService(cart).createCart()
+        updatedCart <- cartService(emptyCart).addProduct(emptyCart.id, cheerios, quantity)
+      } yield assertEquals(updatedCart, cart)
+    }
   }
 
   test("Cart subtotal should be the sum of price for all items") {
-    for {
-      cart <- cartService.createCart()
-      updatedCart <- cartService.addProduct(cart.id, cheeriosProductName, quantityOne)
-    } yield assert(updatedCart.totals.subTotal === subTotalOneCheerios)
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      for {
+        emptyCart <- cartService(cart).createCart()
+        _ <- cartService(emptyCart).addProduct(emptyCart.id, cheerios, quantity)
+        updatedCart <- cartService(emptyCart).addProduct(emptyCart.id, weetabix, quantity)
+      } yield assertEquals(updatedCart.totals.subTotal, productPrices(cheerios) + productPrices(weetabix))
+    }
   }
 
   test("Tax should be calculated on subtotal") {
-    for {
-      cart <- cartService.createCart()
-      updatedCart <- cartService.addProduct(cart.id, cheeriosProductName, quantityOne)
-    } yield assert(updatedCart.totals.tax.amount === taxAmountOneCheerios)
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      for {
+        emptyCart <- cartService(cart).createCart()
+        updatedCart <- cartService(emptyCart).addProduct(emptyCart.id, weetabix, quantity)
+      } yield assertEquals(updatedCart.totals.tax.amount, productPrices(weetabix) * taxRate.value)
+    }
   }
 
   test("Total should be tax amount + subtotal") {
-    for {
-      cart <- cartService.createCart()
-      updatedCart <- cartService.addProduct(cart.id, cheeriosProductName, quantityOne)
-    } yield assert(updatedCart.totals.total === subTotalOneCheerios + taxAmountOneCheerios)
-  }
-
-  test("Calculate totals") {
-    for {
-      cart <- cartService.createCart()
-      _ <- cartService.addProduct(cart.id, ProductName("cornflakes"), quantityOne)
-      _ <- cartService.addProduct(cart.id, ProductName("cornflakes"), quantityOne)
-      _ <- cartService.addProduct(cart.id, ProductName("weetabix"), quantityOne)
-      updatedCart <- cartService.getCart(cart.id)
-    } yield assert(updatedCart.totals === CartTotals(subTotal = Money(15.02), tax = Tax(taxRate, Money(1.88)), total = Money(16.90)))
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      for {
+        emptyCart <- cartService(cart).createCart()
+        updatedCart <- cartService(emptyCart).addProduct(emptyCart.id, weetabix, quantity)
+      } yield assertEquals(updatedCart.totals.subTotal, productPrices(weetabix) + productPrices(weetabix) * taxRate.value)
+    }
   }
 
   test("Adding product to non existing cart should fail") {
-    val nonExistingCartId = newCartId("non-existing-cart-id")
-    interceptMessageIO[CartError](s"Cart with id: $nonExistingCartId doesn't exist.") {
-      for {
-        _ <- cartService.addProduct(nonExistingCartId, cheeriosProductName, quantityOne)
-      } yield ()
+    forAllF { (cart: Cart, quantity: Quantity) =>
+      val nonExistingCartId = CartId(UUID.nameUUIDFromBytes("non-existing-cart-id".getBytes))
+      val expectedError = CartError(nonExistingCartId, "")
+      cartService(cart).addProduct(nonExistingCartId, weetabix, quantity)
+        .attempt
+        .map {
+          case Left(e) => assertEquals(e, expectedError)
+          case Right(_) => fail("expected test failure")
+        }
     }
   }
 
   test("Adding non existing product should fail") {
-    val nonExistingProductName = ProductName("non-existing-product-name")
-    interceptMessageIO[ProductError](s"Product with name: $nonExistingProductName doesn't exist.") {
-      for {
-        cart <- cartService.createCart()
-        _ <- cartService.addProduct(cart.id, cheeriosProductName, quantityOne)
-      } yield ()
+    forAllF { (cart: Cart, cartId: CartId, quantity: Quantity) =>
+      val nonExistingProduct = ProductName("non-existing-product-name")
+      val expectedError = ProductError(nonExistingProduct, "")
+      cartService(cart).addProduct(cartId, nonExistingProduct, quantity)
+        .attempt
+        .map {
+          case Left(e) => assertEquals(e, expectedError)
+          case Right(_) => fail("expected test failure")
+        }
     }
   }
 
+  // getCart
+  test("Calculate totals") {
+    forAllF { (cart: Cart, cartId: CartId, quantity: Quantity) =>
+      val quantityOne = Quantity(1)
+      for {
+        cart <- cartService(cart).createCart()
+        _ <- cartService(cart).addProduct(cart.id, ProductName("cornflakes"), quantityOne)
+        _ <- cartService(cart).addProduct(cart.id, ProductName("cornflakes"), quantityOne)
+        _ <- cartService(cart).addProduct(cart.id, ProductName("weetabix"), quantityOne)
+        updatedCart <- cartService(cart).getCart(cart.id)
+      } yield assertEquals(updatedCart.totals, CartTotals(subTotal = Money(15.02), tax = Tax(taxRate, Money(1.88)), total = Money(16.90)))
+    }
+  }
 
 }
