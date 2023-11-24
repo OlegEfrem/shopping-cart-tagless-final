@@ -1,7 +1,6 @@
 package com.shop.http
 
 import cats.effect.IO
-import cats.implicits.catsSyntaxEq
 import com.shop.generators._
 import com.shop.model.error.ProductError
 import com.shop.model.moneyContext

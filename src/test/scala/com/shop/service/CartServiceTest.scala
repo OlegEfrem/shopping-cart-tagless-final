@@ -18,7 +18,7 @@ class CartServiceTest extends CatsEffectSuite {
   private val cartId = newCartId("test-cart-id")
   private val cheeriosProductName = ProductName("cheerios")
   private val cheeriosPrice = Money(8.43)
-  private val quantityOne = Quantity(1)
+  private val quantityOne = Quantity(0)
   private val subTotalOneCheerios = cheeriosPrice * quantityOne.value.value
   private val taxAmountOneCheerios = cheeriosPrice * taxRate.value
   private val taxOneCheerios = Tax(taxRate, taxAmountOneCheerios)

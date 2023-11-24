@@ -45,6 +45,6 @@ lazy val root = (project in file(".")).settings(
   )
 )
 
-scalacOptions += "-Ymacro-annotations"
+scalacOptions ++= Seq("-Ymacro-annotations")
 
 addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
