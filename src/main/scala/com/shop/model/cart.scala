@@ -4,15 +4,18 @@ import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.{Tax, TaxRate}
 import derevo.cats.{eqv, monoid, show}
 import derevo.derive
+import eu.timepit.refined.types.all.{NonNegInt}
 import io.estatico.newtype.macros.newtype
 import squants.Money
 import squants.market.Money
 
 import java.util.UUID
+import eu.timepit.refined.cats._
+import eu.timepit.refined.api.Refined
 
 object cart {
   @derive(eqv, monoid, show)
-  @newtype case class Quantity(value: Int)
+  @newtype case class Quantity(value: NonNegInt)
 
   @derive(eqv, show)
   case class Item(product: ShoppingProduct, quantity: Quantity)

@@ -9,9 +9,9 @@ import com.shop.model.error.{CartError, ProductError}
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.Tax
 import munit.CatsEffectSuite
-import squants.market.{GBP, Money}
-
+import squants.market.{Money}
 import java.util.UUID
+import eu.timepit.refined.auto._
 
 class CartServiceTest extends CatsEffectSuite {
   private def newCartId(id: String) = CartId(UUID.nameUUIDFromBytes(id.getBytes))
@@ -19,7 +19,7 @@ class CartServiceTest extends CatsEffectSuite {
   private val cheeriosProductName = ProductName("cheerios")
   private val cheeriosPrice = Money(8.43)
   private val quantityOne = Quantity(1)
-  private val subTotalOneCheerios = cheeriosPrice * quantityOne.value
+  private val subTotalOneCheerios = cheeriosPrice * quantityOne.value.value
   private val taxAmountOneCheerios = cheeriosPrice * taxRate.value
   private val taxOneCheerios = Tax(taxRate, taxAmountOneCheerios)
   private val cheeriosProduct = ShoppingProduct(cheeriosProductName, cheeriosPrice)
@@ -95,7 +95,7 @@ class CartServiceTest extends CatsEffectSuite {
       _ <- cartService.addProduct(cart.id, ProductName("cornflakes"), quantityOne)
       _ <- cartService.addProduct(cart.id, ProductName("weetabix"), quantityOne)
       updatedCart <- cartService.getCart(cart.id)
-    } yield assert(updatedCart.totals === CartTotals(subTotal = GBP(15.02), tax = Tax(taxRate, GBP(1.88)), total = GBP(16.90)))
+    } yield assert(updatedCart.totals === CartTotals(subTotal = Money(15.02), tax = Tax(taxRate, Money(1.88)), total = Money(16.90)))
   }
 
   test("Adding product to non existing cart should fail") {

@@ -13,6 +13,7 @@ import org.http4s.implicits._
 import org.http4s.{HttpRoutes, Response}
 import org.scalacheck.effect.PropF.forAllF
 import squants.market.Money
+import eu.timepit.refined.auto._
 
 class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   private val url = "http://localhost"
@@ -55,5 +56,4 @@ class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
        |"title":"${productName.value}",
        |"price":"$price"
        |}""".stripMargin
-
 }

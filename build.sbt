@@ -32,6 +32,7 @@ lazy val root = (project in file(".")).settings(
     //refined
     "eu.timepit" %% "refined" % "0.11.0",
     "eu.timepit" %% "refined-cats" % "0.11.0",
+    "eu.timepit" %% "refined-scalacheck" % "0.11.0",
     // htt4ps
     "org.http4s" %% "http4s-dsl" % "0.23.24",
     "org.http4s" %% "http4s-ember-client" % "0.23.24",
@@ -39,8 +40,11 @@ lazy val root = (project in file(".")).settings(
     // circe
     "io.circe" %% "circe-core" % "0.14.6",
     "io.circe" %% "circe-generic" % "0.14.6",
-    "io.circe" %% "circe-parser" % "0.14.6"
+    "io.circe" %% "circe-parser" % "0.14.6",
+    "io.circe" %% "circe-refined" % "0.14.6"
   )
 )
 
 scalacOptions += "-Ymacro-annotations"
+
+addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
