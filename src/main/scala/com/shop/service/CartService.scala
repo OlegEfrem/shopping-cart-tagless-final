@@ -6,11 +6,11 @@ import cats.implicits._
 import com.shop.ShopCartError
 import com.shop.config.Config.CartConfig
 import com.shop.http.PricesClient
+import com.shop.model._
 import com.shop.model.cart._
 import com.shop.model.product.{ProductName, ShoppingProduct}
-import com.shop.model.tax.{Tax, TaxRate}
+import com.shop.model.tax.Tax
 import com.shop.repo.CartRepo
-import model._
 
 trait CartService[F[_]] {
   def createCart(): F[Cart]

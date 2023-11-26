@@ -2,8 +2,8 @@ package com.shop
 
 import cats.{Eq, Monoid, Show}
 import com.shop.config.Config
-import com.shop.config.Config.{MoneyConfig, defaultCurrency}
 import com.shop.config.Config.money.{defaultRoundingMode, defaultScale}
+import com.shop.config.Config.{MoneyConfig, defaultCurrency}
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.all.PosInt

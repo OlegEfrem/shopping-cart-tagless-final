@@ -5,7 +5,7 @@ import cats.effect.MonadCancelThrow
 import cats.implicits._
 import com.shop.http.error.PricesClientError
 import com.shop.model.moneyContext
-import com.shop.model.product.{ProductName, ShoppingProduct}
+import com.shop.model.product.ProductName
 import derevo.cats.{eqv, show}
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
@@ -19,7 +19,6 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import io.circe.refined._
 import squants.market.Money
-import model.moneyContext
 
 trait PricesClient[F[_]] {
   def getPrice(productName: ProductName): F[Money]
