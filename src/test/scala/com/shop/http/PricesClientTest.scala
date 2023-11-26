@@ -4,7 +4,7 @@ import cats.effect.IO
 import com.shop.generators._
 import com.shop.http.error.PricesClientError
 import com.shop.model.moneyContext
-import com.shop.model.product.{ProductName, ShoppingProduct}
+import com.shop.model.product.ProductName
 import eu.timepit.refined.auto._
 import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
 import org.http4s.client.Client

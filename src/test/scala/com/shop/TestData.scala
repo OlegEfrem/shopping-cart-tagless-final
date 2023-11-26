@@ -1,9 +1,9 @@
 package com.shop
 
+import com.shop.model.moneyContext
 import com.shop.model.product.ProductName
-import squants.market.Money
-import model.moneyContext
 import eu.timepit.refined.auto._
+import squants.market.Money
 
 object TestData {
   val cheerios: ProductName = ProductName("cheerios")

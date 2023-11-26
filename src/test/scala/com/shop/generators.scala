@@ -3,6 +3,7 @@ package com.shop
 import com.shop.TestData.productPrices
 import com.shop.config.Config.taxRate
 import com.shop.model.cart._
+import com.shop.model.moneyContext
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.Tax
 import eu.timepit.refined.api.Refined
@@ -13,7 +14,6 @@ import squants.market.Money
 
 import java.util.UUID
 import scala.language.implicitConversions
-import model.moneyContext
 
 
 object generators {
