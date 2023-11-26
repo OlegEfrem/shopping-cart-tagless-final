@@ -1,6 +1,6 @@
 package com.shop
 
-import com.shop.TestData._
+import com.shop.TestData.productPrices
 import com.shop.config.Config.taxRate
 import com.shop.model.cart._
 import com.shop.model.product.{ProductName, ShoppingProduct}
@@ -10,6 +10,7 @@ import eu.timepit.refined.auto._
 import org.scalacheck.{Arbitrary, Gen}
 import squants.Money
 import squants.market.Money
+
 import java.util.UUID
 import scala.language.implicitConversions
 import model.moneyContext

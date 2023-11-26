@@ -88,3 +88,9 @@ The below is a sample with the correct values you can use to confirm your calcul
 * Subtotal = 15.02
 * Tax = 1.88
 * Total = 16.90
+
+# Resolving ambiguity
+* Can prices change ?
+  * we assume they can change;
+  * for this reason we do not cache prices as we consider more important at this point price accuracy over performance optimization;
+  * if performance (or cost) for calling an external service to check the price becomes a problem, a cache could be added, but the implementation would need to make sure it is kept in sync with price updates;

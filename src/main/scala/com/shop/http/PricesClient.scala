@@ -3,7 +3,8 @@ package http
 
 import cats.effect.MonadCancelThrow
 import cats.implicits._
-import com.shop.model.error.ProductError
+import com.shop.http.error.PricesClientError
+import com.shop.model.moneyContext
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import derevo.cats.{eqv, show}
 import derevo.circe.magnolia.{decoder, encoder}
@@ -21,7 +22,11 @@ import squants.market.Money
 import model.moneyContext
 
 trait PricesClient[F[_]] {
-  def getPrice(productName: ProductName): F[ShoppingProduct]
+  def getPrice(productName: ProductName): F[Money]
+}
+
+object error {
+  case class PricesClientError(productName: ProductName, reason: String) extends HttpClientError(s"Product: $productName, error: $reason")
 }
 
 object PricesClient {
@@ -33,18 +38,18 @@ object PricesClient {
                                                    url: String
                                                  ): PricesClient[F] = {
     new PricesClient[F] with Http4sClientDsl[F] {
-      override def getPrice(productName: ProductName): F[ShoppingProduct] =
+      override def getPrice(productName: ProductName): F[Money] =
         Uri.fromString(url + s"/${productName.value}.json").liftTo[F].flatMap { uri =>
           val request = GET(uri)
           client.run(request).use { resp =>
             resp.status match {
               case Status.Ok =>
-                resp.asJsonDecode[ItemPrice].map(i => ShoppingProduct(productName, Money(i.price)))
+                resp.asJsonDecode[ItemPrice].map(i => Money(i.price))
               case st =>
                 val msg = Option(st.reason).getOrElse("unknown")
                 val errorMsg = s"${request.method} ${request.uri} HTTP error, code:${st.code}, reason: $msg"
-                ProductError(productName, errorMsg)
-                  .raiseError[F, ShoppingProduct]
+                PricesClientError(productName, errorMsg)
+                  .raiseError[F, Money]
             }
           }
         }

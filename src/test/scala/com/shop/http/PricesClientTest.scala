@@ -2,9 +2,10 @@ package com.shop.http
 
 import cats.effect.IO
 import com.shop.generators._
-import com.shop.model.error.ProductError
+import com.shop.http.error.PricesClientError
 import com.shop.model.moneyContext
 import com.shop.model.product.{ProductName, ShoppingProduct}
+import eu.timepit.refined.auto._
 import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
 import org.http4s.client.Client
 import org.http4s.dsl.io._
@@ -12,7 +13,6 @@ import org.http4s.implicits._
 import org.http4s.{HttpRoutes, Response}
 import org.scalacheck.effect.PropF.forAllF
 import squants.market.Money
-import eu.timepit.refined.auto._
 
 class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   private val url = "http://localhost"
@@ -26,19 +26,19 @@ class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
 
   test("HTTP-200 response") {
     forAllF { (productName: ProductName) =>
-      val price = Money(1.12)
-      val client = Client.fromHttpApp(routes(productName.value, Ok(itemPrice(productName, price.amount))))
+      val expectedPrice = Money(1.12)
+      val client = Client.fromHttpApp(routes(productName.value, Ok(itemPrice(productName, expectedPrice.amount))))
       PricesClient
         .make[IO](client, url)
         .getPrice(productName)
-        .map(product => assertEquals(product, ShoppingProduct(productName, price)))
+        .map(obtainedPrice => assertEquals(obtainedPrice, expectedPrice))
     }
   }
 
   test("HTTP-404 response") {
     forAllF { (productName: ProductName) =>
       val client = Client.fromHttpApp(routes(s"${productName.value}", NotFound()))
-      val expectedError = ProductError(productName, s"GET http://localhost/${productName.value}.json HTTP error, code:404, reason: Not Found")
+      val expectedError = PricesClientError(productName, s"GET http://localhost/${productName.value}.json HTTP error, code:404, reason: Not Found")
       PricesClient
         .make[IO](client, url)
         .getPrice(productName)

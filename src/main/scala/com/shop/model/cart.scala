@@ -1,5 +1,6 @@
 package com.shop.model
 
+import com.shop.config.Config.MoneyConfig
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.{Tax, TaxRate}
 import derevo.cats.{eqv, monoid, show}
@@ -24,7 +25,13 @@ object cart {
   @newtype case class CartId(value: UUID)
 
   @derive(eqv, show)
-  case class CartTotals(subTotal: Money, tax: Tax, total: Money)
+  case class CartTotals(subTotal: Money, tax: Tax, total: Money) {
+    def rounded(implicit moneyConfig: MoneyConfig): CartTotals = CartTotals(subTotal.round, Tax(tax.rate, tax.amount.round), total.round)
+    private implicit class MoneyOps(money: Money) {
+      def round(implicit config: MoneyConfig): Money = money.rounded(config.scale, config.roundingMode)
+    }
+
+  }
 
   object CartTotals {
     def zero(taxRate: TaxRate): CartTotals = CartTotals(MoneyOps.zero, Tax(taxRate, MoneyOps.zero), MoneyOps.zero)
