@@ -60,7 +60,7 @@ object CartRepo {
               (newCart.some, Right(newCart))
             case Some(currentCart) if currentCart =!= oldCart =>
               (oldCart.some, Left(CartToModifyChanged(oldCart, currentCart, newCart)))
-            case None =>
+            case None | Some(_) =>
               (oldCart.some, Left(CartNotFound(oldCart.id)))
           }
           modificationResult <- MonadThrow[F].fromEither(updatedCartOrError)
