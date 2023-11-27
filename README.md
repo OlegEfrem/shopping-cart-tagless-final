@@ -90,7 +90,8 @@ The below is a sample with the correct values you can use to confirm your calcul
 * Total = 16.90
 
 # Resolving ambiguity
-* Can prices change ?
-  * we assume they can change;
-  * for this reason we do not cache prices as we consider more important at this point price accuracy over performance optimization;
-  * if performance (or cost) for calling an external service to check the price becomes a problem, a cache could be added, but the implementation would need to make sure it is kept in sync with price updates;
+* Can price change ?
+  * on the assumption it can change:
+    * prices are not cached as price accuracy is considered more important than performance optimization;
+    * if performance (or cost) for calling an external service to check the price becomes a problem, a cache could be added:
+      * an eventual cache implementation would need to make sure it is kept in sync with price updates (by either subscribing to price updates, if the price service supports it, or by pulling prices on a scheduled basis);
