@@ -37,13 +37,13 @@ object CartService {
 
     override def addProduct(cartId: CartId, productName: ProductName, quantity: Quantity): F[Cart] = {
       for {
-        oldCart <- cartRepo.readCart(cartId)
+        oldCart <- cartRepo.getCart(cartId)
         newPrice <- pricesClient.getPrice(productName)
         newCart = addProduct(oldCart, ShoppingProduct(productName, newPrice), quantity)
       } yield newCart
     }
 
-    override def getCart(cartId: CartId): F[Cart] = cartRepo.readCart(cartId)
+    override def getCart(cartId: CartId): F[Cart] = cartRepo.getCart(cartId)
 
     private def addProduct(oldCart: Cart, product: ShoppingProduct, quantity: Quantity): Cart = {
       val newItem = addQuantity(oldCart, product, quantity)

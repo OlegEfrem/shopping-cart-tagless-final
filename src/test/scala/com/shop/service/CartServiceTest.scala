@@ -19,12 +19,10 @@ import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
 import org.scalacheck.effect.PropF.forAllF
 import squants.market.Money
 
-import java.util.UUID
-
 class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
 
   // createCart
-  test("New empty cart can be created") {
+  test("Creates a new empty cart") {
     for {
       obtainedCart <- cartService().createCart()
     } yield {
@@ -33,7 +31,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   }
 
   // addProduct
-  test("Product can be added to an empty cart by name and quantity") {
+  test("Adds product to an empty cart by name and quantity") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       for {
         emptyCart <- cartService().createCart()
@@ -42,7 +40,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Product can be added to a non empty cart by name and quantity") {
+  test("Adds product to a non empty cart by name and quantity") {
     forAllF { (cart: Cart, quantity: Quantity) =>
       val item = cart.items.head._2
       val productName = item.product.name
@@ -58,7 +56,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Product price should be found by product name") {
+  test("Finds product price by product name") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       for {
         emptyCart <- cartService().createCart()
@@ -67,7 +65,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Cart state (items & totals) must be available when adding a product") {
+  test("Returns cart state (items & totals) when adding a product") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       def expectedCart(id: CartId) = {
         val productPrice = productPrices(productName)
@@ -84,7 +82,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Cart subtotal should be the sum of price for all items") {
+  test("Returns cart subtotal as the sum of price for all items") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       val expectedSubtotal = productPrices(productName) * quantity.value.value
       for {
@@ -96,7 +94,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Tax should be calculated on subtotal") {
+  test("Returns tax calculated on subtotal") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       val subtotal = productPrices(productName) * quantity.value.value
       val expectedTaxAmount = subtotal * taxRate.value
@@ -107,7 +105,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Total should be tax amount + subtotal") {
+  test("Returns total as tax amount + subtotal") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       val subtotal = productPrices(productName) * quantity.value.value
       val taxAmount = subtotal * taxRate.value
@@ -119,17 +117,17 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Adding product to non existing cart should fail") {
+  test("Returns error on attempt to add a product to a non existing cart") {
     val cartId = aCartId
     val cartNotFoundRepo = new TestCartRepo() {
-      override def readCart(cartId: CartId): IO[Cart] = CartNotFound(cartId).raiseError[IO, Cart]
+      override def getCart(cartId: CartId): IO[Cart] = CartNotFound(cartId).raiseError[IO, Cart]
     }
     interceptMessageIO[CartNotFound](s"Cart with id: $cartId not found.") {
       cartService(cartNotFoundRepo).addProduct(cartId, weetabix, Quantity(1))
     }
   }
 
-  test("Adding a product with no price should fail") {
+  test("Returns error on attempt to add a product with price not found") {
     val productName = ProductName("no-price-product")
     val error = PricesClientError(productName, "errorMsg")
 
@@ -142,7 +140,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   }
 
   // getCart
-  test("Calculated totals should be rounded") {
+  test("Calculates multiple products totals rounding half-up") {
     val cartId = aCartId
     val quantityOne = Quantity(1)
     for {
@@ -154,10 +152,10 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     } yield assertEquals(updatedCart.totals.rounded, CartTotals(subTotal = Money(15.02), tax = Tax(taxRate, Money(1.88)), total = Money(16.90)))
   }
 
-  test("Getting a non existing cart should fail") {
+  test("Returns error on attempt to get  a non existing cart") {
     val cartId = aCartId
     val cartNotFoundRepo = new TestCartRepo() {
-      override def readCart(cartId: CartId): IO[Cart] = CartNotFound(cartId).raiseError[IO, Cart]
+      override def getCart(cartId: CartId): IO[Cart] = CartNotFound(cartId).raiseError[IO, Cart]
     }
     interceptMessageIO[CartNotFound](s"Cart with id: $cartId not found.") {
       cartService(cartNotFoundRepo).getCart(cartId)
@@ -166,15 +164,9 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
 
   private def cartService(cartRepo: CartRepo[IO] = aCartRepo(), pricesClient: PricesClient[IO] = new TestPricesClient): CartService[IO] = CartService.make[IO](pricesClient, cartRepo, CartConfig())
 
-  private def pricesClientError(productName: ProductName): PricesClientError = PricesClientError(productName, "errorMsg")
-
   protected class TestPricesClient extends PricesClient[IO] {
     override def getPrice(productName: ProductName): IO[Money] = IO.pure(productPrices(productName))
   }
-
-  def aCartId: CartId = CartId(UUID.randomUUID)
-
-  private def anEmptyCart(id: CartId = aCartId): Cart = Cart.empty(id, taxRate)
 
   /* TODO: test this scenario on the repo
   private val cartRepoRepoStubErrorCartModified = new TestCartRepo() {
@@ -186,7 +178,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   protected class TestCartRepo(cart: Cart = anEmptyCart()) extends CartRepo[IO] {
     override def createCart(): IO[Cart] = IO.pure(anEmptyCart())
 
-    override def readCart(cartId: CartId): IO[Cart] = IO.pure(cart)
+    override def getCart(cartId: CartId): IO[Cart] = IO.pure(cart)
 
     override def replaceCart(oldCart: Cart, newCart: Cart): IO[Unit] = IO.unit
   }
