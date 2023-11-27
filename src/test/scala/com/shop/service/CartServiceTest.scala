@@ -31,7 +31,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   }
 
   // addProduct
-  test("Adds product to an empty cart by name and quantity") {
+  test("Adds a product to an empty cart by name and quantity") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       for {
         emptyCart <- cartService().createCart()
@@ -40,7 +40,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Adds product to a non empty cart by name and quantity") {
+  test("Adds a product to a non empty cart by name and quantity") {
     forAllF { (cart: Cart, quantity: Quantity) =>
       val item = cart.items.head._2
       val productName = item.product.name
@@ -56,7 +56,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Finds product price by product name") {
+  test("Finds a product price by product name") {
     forAllF { (productName: ProductName, quantity: Quantity) =>
       for {
         emptyCart <- cartService().createCart()
@@ -152,7 +152,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     } yield assertEquals(updatedCart.totals.rounded, CartTotals(subTotal = Money(15.02), tax = Tax(taxRate, Money(1.88)), total = Money(16.90)))
   }
 
-  test("Returns error on attempt to get  a non existing cart") {
+  test("Returns error on attempt to get a non existing cart") {
     val cartId = aCartId
     val cartNotFoundRepo = new TestCartRepo() {
       override def getCart(cartId: CartId): IO[Cart] = CartNotFound(cartId).raiseError[IO, Cart]

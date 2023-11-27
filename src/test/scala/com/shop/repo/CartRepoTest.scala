@@ -23,7 +23,7 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
 
   }
 
-  test("Creates a new empty cart returning it") {
+  test("Creates a new empty") {
     for {
       (cartsRef, cartsRepo) <- refAndRepo()
       createdCart <- cartsRepo.createCart()
@@ -41,7 +41,7 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test(s"Returns error on attempt to get a non existing cart") {
+  test(s"Returns error if cart not found") {
     val cartId = aCartId
     interceptMessageIO[CartNotFound](s"Cart with id: $cartId not found.") {
       for {
@@ -62,7 +62,7 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Returns error on different carts modification") {
+  test("Returns error on different carts replacement") {
     forAllF { (cart: Cart) =>
       val oldCart = anEmptyCart()
       interceptMessageIO[DifferentCartsReplacement](s"Tried to replace cart with id: ${oldCart.id} with cart with id: ${cart.id}.") {
