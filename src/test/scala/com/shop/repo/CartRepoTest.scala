@@ -6,7 +6,7 @@ import com.shop.TestData._
 import com.shop.config.Config.CartConfig
 import com.shop.generators._
 import com.shop.model.cart.{Cart, CartId}
-import com.shop.repo.error.{CartNotFound, DifferentCartsReplacement}
+import com.shop.repo.error.{CartNotFound, CartToModifyChanged, DifferentCartsReplacement}
 import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
 import org.scalacheck.effect.PropF.forAllF
 import cats.implicits._
@@ -65,7 +65,7 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   test("Returns error on different carts modification") {
     forAllF { (cart: Cart) =>
       val oldCart = anEmptyCart()
-      interceptMessageIO[DifferentCartsReplacement](s"CTried to replace cart with id: ${oldCart.id} with cart with id: ${cart.id}.") {
+      interceptMessageIO[DifferentCartsReplacement](s"Tried to replace cart with id: ${oldCart.id} with cart with id: ${cart.id}.") {
         for {
           (_, cartsRepo) <- refAndRepo(Map(cart.id -> cart))
           _ <- cartsRepo.replaceCart(oldCart, cart)
@@ -78,7 +78,7 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   test("Returns error on same cart concurrent modification") {
     forAllF { (cart: Cart) =>
       val oldCart = anEmptyCart(cart.id)
-      interceptMessageIO[CartNotFound](s"Cart with id: ${cart.id} was already modified.") {
+      interceptMessageIO[CartToModifyChanged](s"Cart to modify:: ${cart.id} was changed.") {
         for {
           (_, cartsRepo) <- refAndRepo(Map(cart.id -> cart))
           _ <- cartsRepo.replaceCart(oldCart, cart)
@@ -97,7 +97,7 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
       val carts = cartIds.map(i => anEmptyCart(i) -> cart.copy(id = i)).toMap
       val emptyCarts = carts.keys.map(ec => ec.id -> ec).toMap
       for {
-        (cartsRef, cartsRepo) <- refAndRepo(emptyCarts, shardCount = cartsSize * 3)
+        (cartsRef, cartsRepo) <- refAndRepo(emptyCarts)
         _ <- carts.map { case (empty, nonEmpty) => cartsRepo.replaceCart(empty, nonEmpty) }.toList.parSequence.void
         refCarts <- cartIds.map(cartsRef(_).get).toList.sequence
       } yield assertEquals(refCarts.size, cartsSize)
