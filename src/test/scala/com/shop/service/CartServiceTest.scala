@@ -180,7 +180,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
 
     override def getCart(cartId: CartId): IO[Cart] = IO.pure(cart)
 
-    override def replaceCart(oldCart: Cart, newCart: Cart): IO[Unit] = IO.unit
+    override def replaceCart(oldCart: Cart, newCart: Cart): IO[Cart] = IO.pure(newCart)
   }
 
 }
