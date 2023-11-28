@@ -3,7 +3,7 @@ package com.shop.cart.service
 import cats.effect.IO
 import cats.implicits._
 import com.shop.cart.TestData._
-import com.shop.cart.config.Config.{CartConfig, taxRate}
+import com.shop.cart.config.Config.{CartConfig, cartConfig, taxRate}
 import com.shop.cart.config.Implicits.{moneyConfig, moneyContext}
 import com.shop.cart.generators._
 import com.shop.cart.http.PricesClient
@@ -88,7 +88,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
         emptyCart <- cartService().createCart()
         obtainedCart <- cartService(aCartRepo(emptyCart)).addProduct(emptyCart.id, productName, quantity)
       } yield {
-        assertEquals(obtainedCart.totals.subTotal, expectedSubtotal)
+        assertEquals(obtainedCart.totals.subtotal, expectedSubtotal)
       }
     }
   }
@@ -148,7 +148,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
       c2 <- cartService(aCartRepo(c1)).addProduct(cartId, cornflakes, quantityOne)
       c3 <- cartService(aCartRepo(c2)).addProduct(cartId, weetabix, quantityOne)
       updatedCart <- cartService(aCartRepo(c3)).getCart(cartId)
-    } yield assertEquals(updatedCart.totals.rounded, CartTotals(subTotal = Money(15.02), tax = Tax(taxRate, Money(1.88)), total = Money(16.90)))
+    } yield assertEquals(updatedCart.totals.rounded, CartTotals(subtotal = Money(15.02), tax = Tax(taxRate, Money(1.88)), total = Money(16.90)))
   }
 
   test("Returns error on attempt to get a non existing cart") {
@@ -162,7 +162,7 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   }
 
   private def cartService(cartRepo: CartRepo[IO] = aCartRepo(), pricesClient: PricesClient[IO] = new TestPricesClient): CartService[IO] =
-    CartService.make[IO](pricesClient, cartRepo, CartConfig())
+    CartService.make[IO](pricesClient, cartRepo, cartConfig)
 
   protected class TestPricesClient extends PricesClient[IO] {
     override def getPrice(productName: ProductName): IO[Money] = IO.pure(productPrices(productName))

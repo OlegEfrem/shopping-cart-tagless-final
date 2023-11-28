@@ -4,7 +4,7 @@ import cats.effect.IO
 import cats.effect.std.MapRef
 import cats.implicits._
 import com.shop.cart.TestData._
-import com.shop.cart.config.Config.CartConfig
+import com.shop.cart.config.Config.cartConfig
 import com.shop.cart.generators._
 import com.shop.cart.model.cart.{Cart, CartId}
 import com.shop.cart.repo.error.{CartNotFound, CartToModifyChanged, DifferentCartsReplacement}
@@ -19,11 +19,11 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     for {
       cartsRef <- MapRef.ofShardedImmutableMap[IO, CartId, Cart](shardCount)
       _ <- carts.map { case (key, value) => cartsRef(key).update(_ => value.some) }.toList.sequence
-    } yield (cartsRef, CartRepo.make[IO](cartsRef, CartConfig()))
+    } yield (cartsRef, CartRepo.make[IO](cartsRef, cartConfig))
 
   }
 
-  test("Creates a new empty") {
+  test("Creates a new empty cart") {
     for {
       (cartsRef, cartsRepo) <- refAndRepo()
       createdCart <- cartsRepo.createCart()
@@ -100,6 +100,18 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
         _ <- carts.map { case (empty, nonEmpty) => cartsRepo.replaceCart(empty, nonEmpty) }.toList.parSequence.void
         refCarts <- cartIds.map(cartsRef(_).get).toList.sequence
       } yield assertEquals(refCarts.size, cartsSize)
+    }
+  }
+
+  test("Creates an empty cart, replaces it with non empty & gets non empty cart") {
+    forAllF { (cart: Cart) =>
+      def nonEmptyCart(id: CartId) = cart.copy(id = id)
+      for {
+        (_, cartsRepo) <- refAndRepo()
+        emptyCart <- cartsRepo.createCart()
+        _ <- cartsRepo.replaceCart(emptyCart, nonEmptyCart(emptyCart.id))
+        obtainedCart <- cartsRepo.getCart(emptyCart.id)
+      } yield assertEquals(obtainedCart, nonEmptyCart(emptyCart.id))
     }
   }
 

@@ -78,7 +78,7 @@ object generators {
     subTotal = subTotalFor(items)
     taxAmount = subTotal * taxRate.value
     total = subTotal + taxAmount
-    cartTotals = CartTotals(subTotal = subTotal, tax = Tax(taxRate, taxAmount), total = total)
+    cartTotals = CartTotals(subtotal = subTotal, tax = Tax(taxRate, taxAmount), total = total)
   } yield Cart(id, items, cartTotals)
   implicit val cartArb: Arbitrary[Cart] = Arbitrary(cartGen)
 

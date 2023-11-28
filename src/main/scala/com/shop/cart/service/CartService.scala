@@ -41,6 +41,7 @@ object CartService {
         oldCart <- cartRepo.getCart(cartId)
         newPrice <- pricesClient.getPrice(productName)
         newCart = addProduct(oldCart, ShoppingProduct(productName, newPrice), quantity)
+        _ <- cartRepo.replaceCart(oldCart, newCart)
       } yield newCart
     }
 

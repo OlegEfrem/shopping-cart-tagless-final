@@ -1,6 +1,7 @@
 package com.shop.cart.http
 
 import cats.effect.IO
+import com.shop.cart.config.Config.{PricesClientConfig, pricesClientConfig}
 import com.shop.cart.config.Implicits.moneyContext
 import com.shop.cart.generators._
 import com.shop.cart.http.error.PricesClientError
@@ -15,7 +16,7 @@ import org.scalacheck.effect.PropF.forAllF
 import squants.market.Money
 
 class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
-  private val url = "http://localhost"
+  private val url = "http://localhost/"
 
   private def routes(productName: String, response: IO[Response[IO]]) =
     HttpRoutes
@@ -29,7 +30,7 @@ class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
       val expectedPrice = Money(1.12)
       val client = Client.fromHttpApp(routes(productName.value, Ok(itemPrice(productName, expectedPrice.amount))))
       PricesClient
-        .make[IO](client, url)
+        .make[IO](client, PricesClientConfig(url))
         .getPrice(productName)
         .map(obtainedPrice => assertEquals(obtainedPrice, expectedPrice))
     }
@@ -40,7 +41,7 @@ class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
       val client = Client.fromHttpApp(routes(s"${productName.value}", NotFound()))
       val expectedError = PricesClientError(productName, s"GET http://localhost/${productName.value}.json HTTP error, code:404, reason: Not Found")
       PricesClient
-        .make[IO](client, url)
+        .make[IO](client, PricesClientConfig(url))
         .getPrice(productName)
         .attempt
         .map {

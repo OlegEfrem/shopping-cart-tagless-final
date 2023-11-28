@@ -2,6 +2,7 @@ package com.shop.cart.http
 
 import cats.effect.MonadCancelThrow
 import cats.implicits._
+import com.shop.cart.config.Config.PricesClientConfig
 import com.shop.cart.config.Implicits.moneyContext
 import com.shop.cart.http.error.PricesClientError
 import com.shop.cart.model.product.ProductName
@@ -33,11 +34,11 @@ object PricesClient {
 
   def make[F[_]: JsonDecoder: MonadCancelThrow](
       client: Client[F],
-      url: String
+      config: PricesClientConfig
   ): PricesClient[F] = {
     new PricesClient[F] with Http4sClientDsl[F] {
       override def getPrice(productName: ProductName): F[Money] =
-        Uri.fromString(url + s"/${productName.value}.json").liftTo[F].flatMap { uri =>
+        Uri.fromString(config.url + s"${productName.value}.json").liftTo[F].flatMap { uri =>
           val request = GET(uri)
           client.run(request).use { resp =>
             resp.status match {

@@ -26,8 +26,9 @@ object cart {
   @newtype case class CartId(value: UUID)
 
   @derive(eqv, show)
-  case class CartTotals(subTotal: Money, tax: Tax, total: Money) {
-    def rounded(implicit moneyConfig: MoneyConfig): CartTotals = CartTotals(subTotal.round, Tax(tax.rate, tax.amount.round), total.round)
+  case class CartTotals(subtotal: Money, tax: Tax, total: Money) {
+    def rounded(implicit moneyConfig: MoneyConfig): CartTotals = CartTotals(subtotal.round, Tax(tax.rate, tax.amount.round), total.round)
+
     private implicit class MoneyOps(money: Money) {
       def round(implicit config: MoneyConfig): Money = money.rounded(config.scale, config.roundingMode)
     }
