@@ -5,13 +5,13 @@ import cats.effect.IO
 import cats.implicits._
 import com.shop.TestData._
 import com.shop.config.Config.{CartConfig, taxRate}
+import com.shop.config.Implicits.{moneyConfig, moneyContext}
 import com.shop.generators._
 import com.shop.http.PricesClient
 import com.shop.http.error.PricesClientError
 import com.shop.model.cart._
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.Tax
-import com.shop.config.Implicits.{moneyConfig, moneyContext}
 import com.shop.repo.CartRepo
 import com.shop.repo.error.CartNotFound
 import eu.timepit.refined.auto._
