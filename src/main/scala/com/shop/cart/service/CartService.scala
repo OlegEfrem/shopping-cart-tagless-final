@@ -14,10 +14,9 @@ import com.shop.cart.repo.CartRepo
 
 trait CartService[F[_]] {
   def createCart(): F[Cart]
-
+  def getCart(cartId: CartId): F[Cart]
   def addProduct(cartId: CartId, productName: ProductName, quantity: Quantity): F[Cart]
 
-  def getCart(cartId: CartId): F[Cart]
 }
 
 object error {
@@ -32,7 +31,10 @@ object CartService {
       cartRepo: CartRepo[F],
       cartConfig: CartConfig
   ): CartService[F] = new CartService[F] {
+
     override def createCart(): F[Cart] = cartRepo.createCart()
+
+    override def getCart(cartId: CartId): F[Cart] = cartRepo.getCart(cartId)
 
     override def addProduct(cartId: CartId, productName: ProductName, quantity: Quantity): F[Cart] = {
       for {
@@ -41,8 +43,6 @@ object CartService {
         newCart = addProduct(oldCart, ShoppingProduct(productName, newPrice), quantity)
       } yield newCart
     }
-
-    override def getCart(cartId: CartId): F[Cart] = cartRepo.getCart(cartId)
 
     private def addProduct(oldCart: Cart, product: ShoppingProduct, quantity: Quantity): Cart = {
       val newItem = addQuantity(oldCart, product, quantity)
