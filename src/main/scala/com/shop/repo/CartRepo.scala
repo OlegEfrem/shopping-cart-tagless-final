@@ -4,8 +4,8 @@ import cats.MonadThrow
 import cats.effect.Concurrent
 import cats.effect.std.{MapRef, UUIDGen}
 import cats.implicits._
-import com.shop.ShopCartError
 import com.shop.config.Config.CartConfig
+import com.shop.error.CartError
 import com.shop.model.cart.{Cart, CartId}
 import com.shop.repo.error.{CartNotFound, CartToModifyChanged, DifferentCartsReplacement}
 
@@ -18,7 +18,7 @@ trait CartRepo[F[_]] {
 }
 
 object error {
-  abstract class CartRepoError(message: String, cause: Option[Exception] = None) extends ShopCartError(message, cause)
+  abstract class CartRepoError(message: String, cause: Option[Exception] = None) extends CartError(message, cause)
 
   case class CartNotFound(cartId: CartId) extends CartRepoError(s"Cart with id: $cartId not found.")
 

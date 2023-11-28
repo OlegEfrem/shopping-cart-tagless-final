@@ -3,8 +3,8 @@ package service
 
 import cats.MonadThrow
 import cats.implicits._
-import com.shop.ShopCartError
 import com.shop.config.Config.CartConfig
+import com.shop.error.CartError
 import com.shop.http.PricesClient
 import com.shop.model._
 import com.shop.model.cart._
@@ -22,9 +22,8 @@ trait CartService[F[_]] {
 
 object error {
 
-  abstract class CartServiceError(override val message: String, cause: Option[Exception] = None) extends ShopCartError(message, cause)
+  abstract class CartServiceError(override val message: String, cause: Option[Exception] = None) extends CartError(message, cause)
 
-  case class CartError(cartId: CartId, reason: String) extends CartServiceError(s"Cart id: $cartId, error: $reason")
 }
 
 object CartService {
