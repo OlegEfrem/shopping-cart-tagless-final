@@ -40,13 +40,13 @@ object CartService {
       for {
         oldCart <- cartRepo.getCart(cartId)
         newPrice <- pricesClient.getPrice(productName)
-        newCart = addProduct(oldCart, ShoppingProduct(productName, newPrice), quantity)
+        newCart = modifyProduct(oldCart, ShoppingProduct(productName, newPrice), quantity)(addQuantity)
         _ <- cartRepo.replaceCart(oldCart, newCart)
       } yield newCart
     }
 
-    private def addProduct(oldCart: Cart, product: ShoppingProduct, quantity: Quantity): Cart = {
-      val newItem = addQuantity(oldCart, product, quantity)
+    private def modifyProduct(oldCart: Cart, product: ShoppingProduct, quantity: Quantity)(modifyFunction: (Cart, ShoppingProduct, Quantity) => Item): Cart = {
+      val newItem = modifyFunction(oldCart, product, quantity)
       val newItems = oldCart.items.+(product.name -> newItem)
       val newTotals = calculateTotals(newItems.values.toList)
       Cart(oldCart.id, newItems, newTotals)
