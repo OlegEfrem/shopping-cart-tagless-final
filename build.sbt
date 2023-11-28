@@ -5,6 +5,7 @@ ThisBuild / evictionErrorLevel := Level.Warn
 
 lazy val root = (project in file(".")).settings(
   name := "cats-effect-3-quick-start",
+  scalafmtOnCompile := true,
   libraryDependencies ++= Seq(
     // "core" module - IO, IOApp, schedulers
     // This pulls in the kernel and std modules automatically.

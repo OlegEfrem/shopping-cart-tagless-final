@@ -7,7 +7,6 @@ import io.estatico.newtype.macros.newtype
 import squants.Money
 import eu.timepit.refined.cats._
 
-
 object product {
   @derive(eqv, show)
   @newtype case class ProductName(value: NonEmptyString)

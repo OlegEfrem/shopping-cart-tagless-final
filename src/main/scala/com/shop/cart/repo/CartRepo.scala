@@ -24,12 +24,13 @@ object error {
 
   case class CartToModifyChanged(oldCart: Cart, modifiedCart: Cart, newCart: Cart) extends CartRepoError(s"Cart to modify: ${oldCart.id} was changed.")
 
-  case class DifferentCartsReplacement(oldCart: Cart, newCart: Cart) extends CartRepoError(s"Tried to replace cart with id: ${oldCart.id} with cart with id: ${newCart.id}.")
+  case class DifferentCartsReplacement(oldCart: Cart, newCart: Cart)
+      extends CartRepoError(s"Tried to replace cart with id: ${oldCart.id} with cart with id: ${newCart.id}.")
 
 }
 
 object CartRepo {
-  def make[F[_] : MonadThrow : Concurrent : UUIDGen](cartsRef: MapRef[F, CartId, Option[Cart]], config: CartConfig): CartRepo[F] =
+  def make[F[_]: MonadThrow: Concurrent: UUIDGen](cartsRef: MapRef[F, CartId, Option[Cart]], config: CartConfig): CartRepo[F] =
     new CartRepo[F] {
       override def createCart(): F[Cart] = {
         for {
@@ -69,5 +70,3 @@ object CartRepo {
 
     }
 }
-
-

@@ -31,10 +31,10 @@ object PricesClient {
   @derive(eqv, show, decoder, encoder)
   case class ItemPrice(title: NonEmptyString, price: BigDecimal)
 
-  def make[F[_] : JsonDecoder : MonadCancelThrow](
-                                                   client: Client[F],
-                                                   url: String
-                                                 ): PricesClient[F] = {
+  def make[F[_]: JsonDecoder: MonadCancelThrow](
+      client: Client[F],
+      url: String
+  ): PricesClient[F] = {
     new PricesClient[F] with Http4sClientDsl[F] {
       override def getPrice(productName: ProductName): F[Money] =
         Uri.fromString(url + s"/${productName.value}.json").liftTo[F].flatMap { uri =>

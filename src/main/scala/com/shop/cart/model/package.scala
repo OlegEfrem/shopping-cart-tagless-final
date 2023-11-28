@@ -39,4 +39,3 @@ trait OrphanInstances {
   implicit val moneyShow: Show[Money] = Show.show(m => m.rounded(defaultScale, defaultRoundingMode).toString)
 
 }
-

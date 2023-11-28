@@ -19,8 +19,8 @@ class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
 
   private def routes(productName: String, response: IO[Response[IO]]) =
     HttpRoutes
-      .of[IO] {
-        case GET -> Root / s"${productName}.json" => response
+      .of[IO] { case GET -> Root / s"${productName}.json" =>
+        response
       }
       .orNotFound
 
@@ -44,7 +44,7 @@ class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
         .getPrice(productName)
         .attempt
         .map {
-          case Left(e) => assertEquals(e, expectedError)
+          case Left(e)  => assertEquals(e, expectedError)
           case Right(_) => fail("expected test failure")
         }
     }

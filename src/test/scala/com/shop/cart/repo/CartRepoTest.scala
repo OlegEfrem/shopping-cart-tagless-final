@@ -88,7 +88,6 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-
   test("Replaces different carts concurrently") {
     forAllF { (cart: Cart) =>
       def cartId(i: Int): CartId = CartId(UUID.nameUUIDFromBytes(i.toString.getBytes()))
@@ -103,6 +102,5 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
       } yield assertEquals(refCarts.size, cartsSize)
     }
   }
-
 
 }

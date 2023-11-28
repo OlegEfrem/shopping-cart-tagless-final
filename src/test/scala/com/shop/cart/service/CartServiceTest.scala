@@ -161,7 +161,8 @@ class CartServiceTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  private def cartService(cartRepo: CartRepo[IO] = aCartRepo(), pricesClient: PricesClient[IO] = new TestPricesClient): CartService[IO] = CartService.make[IO](pricesClient, cartRepo, CartConfig())
+  private def cartService(cartRepo: CartRepo[IO] = aCartRepo(), pricesClient: PricesClient[IO] = new TestPricesClient): CartService[IO] =
+    CartService.make[IO](pricesClient, cartRepo, CartConfig())
 
   protected class TestPricesClient extends PricesClient[IO] {
     override def getPrice(productName: ProductName): IO[Money] = IO.pure(productPrices(productName))

@@ -15,7 +15,6 @@ import squants.market.Money
 import java.util.UUID
 import scala.language.implicitConversions
 
-
 object generators {
 
   private val nonEmptyStringGen: Gen[String] =

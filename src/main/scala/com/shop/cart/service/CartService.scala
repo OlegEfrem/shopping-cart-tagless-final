@@ -27,11 +27,11 @@ object error {
 }
 
 object CartService {
-  def make[F[_] : MonadThrow](
-                               pricesClient: PricesClient[F],
-                               cartRepo: CartRepo[F],
-                               cartConfig: CartConfig
-                             ): CartService[F] = new CartService[F] {
+  def make[F[_]: MonadThrow](
+      pricesClient: PricesClient[F],
+      cartRepo: CartRepo[F],
+      cartConfig: CartConfig
+  ): CartService[F] = new CartService[F] {
     override def createCart(): F[Cart] = cartRepo.createCart()
 
     override def addProduct(cartId: CartId, productName: ProductName, quantity: Quantity): F[Cart] = {
@@ -51,11 +51,10 @@ object CartService {
       Cart(oldCart.id, newItems, newTotals)
     }
 
-
     private def addQuantity(oldCart: Cart, product: ShoppingProduct, quantity: Quantity): Item = {
       val newQuantity = oldCart.items.get(product.name) match {
         case Some(item) => item.quantity |+| quantity
-        case None => quantity
+        case None       => quantity
       }
       Item(product, newQuantity)
     }
@@ -68,4 +67,3 @@ object CartService {
     }
   }
 }
-
