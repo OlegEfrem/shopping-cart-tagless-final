@@ -3,7 +3,7 @@ package com.shop
 import com.shop.TestData.productPrices
 import com.shop.config.Config.taxRate
 import com.shop.model.cart._
-import com.shop.model.moneyContext
+import com.shop.config.Implicits.moneyContext
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.Tax
 import eu.timepit.refined.api.Refined
@@ -48,7 +48,7 @@ object generators {
   private val quantityGen: Gen[Quantity] = Gen.chooseNum(1, 5).map(n => Quantity(Refined.unsafeApply(n)))
   implicit val quantityArb: Arbitrary[Quantity] = Arbitrary(quantityGen)
 
-  private val moneyGen: Gen[Money] = Gen.chooseNum[BigDecimal](1, 10).map(n => Money(n)(model.moneyContext))
+  private val moneyGen: Gen[Money] = Gen.chooseNum[BigDecimal](1, 10).map(n => Money(n))
   implicit val moneyArb: Arbitrary[Money] = Arbitrary(moneyGen)
 
   private val productGen: Gen[ShoppingProduct] = for {

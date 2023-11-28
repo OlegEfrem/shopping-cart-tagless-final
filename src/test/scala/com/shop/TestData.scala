@@ -2,7 +2,7 @@ package com.shop
 
 import com.shop.config.Config.taxRate
 import com.shop.model.cart.{Cart, CartId}
-import com.shop.model.moneyContext
+import com.shop.config.Implicits.moneyContext
 import com.shop.model.product.ProductName
 import eu.timepit.refined.auto._
 import squants.market.Money

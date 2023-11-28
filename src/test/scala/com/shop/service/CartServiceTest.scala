@@ -11,7 +11,7 @@ import com.shop.http.error.PricesClientError
 import com.shop.model.cart._
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.Tax
-import com.shop.model.{moneyConfig, moneyContext}
+import com.shop.config.Implicits.{moneyConfig, moneyContext}
 import com.shop.repo.CartRepo
 import com.shop.repo.error.CartNotFound
 import eu.timepit.refined.auto._

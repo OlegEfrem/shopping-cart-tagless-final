@@ -1,23 +1,17 @@
 package com.shop
 
 import cats.{Eq, Monoid, Show}
-import com.shop.config.Config
 import com.shop.config.Config.money.{defaultRoundingMode, defaultScale}
-import com.shop.config.Config.{MoneyConfig, defaultCurrency}
+import com.shop.config.Implicits.moneyContext
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.all.PosInt
 import io.circe.{Decoder, Encoder}
-import squants.market.{Currency, Money, MoneyContext}
+import squants.market.{Currency, Money}
 
-package object model extends OrphanInstances {
-  implicit val moneyContext: MoneyContext = MoneyContext(defaultCurrency, Set.empty, Seq.empty)
-  implicit val moneyConfig: MoneyConfig = MoneyConfig(Config.money.defaultScale, Config.money.defaultRoundingMode)
-}
+package object model extends OrphanInstances
 
 trait OrphanInstances {
-  import model.moneyContext
-
   implicit val moneyDecoder: Decoder[Money] =
     Decoder[BigDecimal].map(Money.apply)
 

@@ -3,8 +3,8 @@ package http
 
 import cats.effect.MonadCancelThrow
 import cats.implicits._
+import com.shop.config.Implicits.moneyContext
 import com.shop.http.error.PricesClientError
-import com.shop.model.moneyContext
 import com.shop.model.product.ProductName
 import derevo.cats.{eqv, show}
 import derevo.circe.magnolia.{decoder, encoder}

@@ -1,6 +1,7 @@
 package com.shop.model
 
 import com.shop.config.Config.MoneyConfig
+import com.shop.config.Implicits.moneyContext
 import com.shop.model.product.{ProductName, ShoppingProduct}
 import com.shop.model.tax.{Tax, TaxRate}
 import derevo.cats.{eqv, monoid, show}
