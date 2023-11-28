@@ -1,16 +1,16 @@
-package com.shop
+package com.shop.cart
 package service
 
 import cats.MonadThrow
 import cats.implicits._
-import com.shop.config.Config.CartConfig
-import com.shop.error.CartError
-import com.shop.http.PricesClient
-import com.shop.model._
-import com.shop.model.cart._
-import com.shop.model.product.{ProductName, ShoppingProduct}
-import com.shop.model.tax.Tax
-import com.shop.repo.CartRepo
+import com.shop.cart.config.Config.CartConfig
+import com.shop.cart.error.CartError
+import com.shop.cart.http.PricesClient
+import com.shop.cart.model._
+import com.shop.cart.model.cart._
+import com.shop.cart.model.product.{ProductName, ShoppingProduct}
+import com.shop.cart.model.tax.Tax
+import com.shop.cart.repo.CartRepo
 
 trait CartService[F[_]] {
   def createCart(): F[Cart]

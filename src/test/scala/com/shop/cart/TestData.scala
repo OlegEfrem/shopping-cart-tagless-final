@@ -1,9 +1,9 @@
-package com.shop
+package com.shop.cart
 
-import com.shop.config.Config.taxRate
-import com.shop.config.Implicits.moneyContext
-import com.shop.model.cart.{Cart, CartId}
-import com.shop.model.product.ProductName
+import com.shop.cart.config.Config.taxRate
+import com.shop.cart.config.Implicits.moneyContext
+import com.shop.cart.model.cart.{Cart, CartId}
+import com.shop.cart.model.product.ProductName
 import eu.timepit.refined.auto._
 import squants.market.Money
 

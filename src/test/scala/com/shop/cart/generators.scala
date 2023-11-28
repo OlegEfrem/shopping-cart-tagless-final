@@ -1,11 +1,11 @@
-package com.shop
+package com.shop.cart
 
-import com.shop.TestData.productPrices
-import com.shop.config.Config.taxRate
-import com.shop.config.Implicits.moneyContext
-import com.shop.model.cart._
-import com.shop.model.product.{ProductName, ShoppingProduct}
-import com.shop.model.tax.Tax
+import com.shop.cart.TestData.productPrices
+import com.shop.cart.config.Config.taxRate
+import com.shop.cart.config.Implicits.moneyContext
+import com.shop.cart.model.cart._
+import com.shop.cart.model.product.{ProductName, ShoppingProduct}
+import com.shop.cart.model.tax.Tax
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import org.scalacheck.{Arbitrary, Gen}

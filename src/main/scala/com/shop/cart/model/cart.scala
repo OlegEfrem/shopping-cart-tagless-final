@@ -1,9 +1,9 @@
-package com.shop.model
+package com.shop.cart.model
 
-import com.shop.config.Config.MoneyConfig
-import com.shop.config.Implicits.moneyContext
-import com.shop.model.product.{ProductName, ShoppingProduct}
-import com.shop.model.tax.{Tax, TaxRate}
+import com.shop.cart.config.Config.MoneyConfig
+import com.shop.cart.config.Implicits.moneyContext
+import com.shop.cart.model.product.{ProductName, ShoppingProduct}
+import com.shop.cart.model.tax.{Tax, TaxRate}
 import derevo.cats.{eqv, monoid, show}
 import derevo.derive
 import eu.timepit.refined.types.all.PosInt

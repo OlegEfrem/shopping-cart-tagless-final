@@ -1,4 +1,4 @@
-package com.shop.model
+package com.shop.cart.model
 
 import derevo.cats.{eqv, monoid, show}
 import derevo.derive

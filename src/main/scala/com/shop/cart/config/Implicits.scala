@@ -1,6 +1,6 @@
-package com.shop.config
+package com.shop.cart.config
 
-import com.shop.config.Config.{MoneyConfig, defaultCurrency}
+import com.shop.cart.config.Config.{MoneyConfig, defaultCurrency}
 import squants.market.MoneyContext
 
 object Implicits {

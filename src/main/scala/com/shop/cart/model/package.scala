@@ -1,8 +1,8 @@
-package com.shop
+package com.shop.cart
 
 import cats.{Eq, Monoid, Show}
-import com.shop.config.Config.money.{defaultRoundingMode, defaultScale}
-import com.shop.config.Implicits.moneyContext
+import com.shop.cart.config.Config.money.{defaultRoundingMode, defaultScale}
+import com.shop.cart.config.Implicits.moneyContext
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.all.PosInt

@@ -1,4 +1,4 @@
-package com.shop
+package com.shop.cart
 
 import cats.effect.{IO, IOApp}
 

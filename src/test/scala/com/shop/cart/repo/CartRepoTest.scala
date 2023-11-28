@@ -1,13 +1,13 @@
-package com.shop.repo
+package com.shop.cart.repo
 
 import cats.effect.IO
 import cats.effect.std.MapRef
 import cats.implicits._
-import com.shop.TestData._
-import com.shop.config.Config.CartConfig
-import com.shop.generators._
-import com.shop.model.cart.{Cart, CartId}
-import com.shop.repo.error.{CartNotFound, CartToModifyChanged, DifferentCartsReplacement}
+import com.shop.cart.TestData._
+import com.shop.cart.config.Config.CartConfig
+import com.shop.cart.generators._
+import com.shop.cart.model.cart.{Cart, CartId}
+import com.shop.cart.repo.error.{CartNotFound, CartToModifyChanged, DifferentCartsReplacement}
 import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
 import org.scalacheck.effect.PropF.forAllF
 

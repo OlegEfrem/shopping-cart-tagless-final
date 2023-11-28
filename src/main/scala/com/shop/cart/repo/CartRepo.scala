@@ -1,13 +1,13 @@
-package com.shop.repo
+package com.shop.cart.repo
 
 import cats.MonadThrow
 import cats.effect.Concurrent
 import cats.effect.std.{MapRef, UUIDGen}
 import cats.implicits._
-import com.shop.config.Config.CartConfig
-import com.shop.error.CartError
-import com.shop.model.cart.{Cart, CartId}
-import com.shop.repo.error.{CartNotFound, CartToModifyChanged, DifferentCartsReplacement}
+import com.shop.cart.config.Config.CartConfig
+import com.shop.cart.error.CartError
+import com.shop.cart.model.cart.{Cart, CartId}
+import com.shop.cart.repo.error.{CartNotFound, CartToModifyChanged, DifferentCartsReplacement}
 
 trait CartRepo[F[_]] {
   def createCart(): F[Cart]

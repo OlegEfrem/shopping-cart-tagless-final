@@ -1,10 +1,10 @@
-package com.shop.http
+package com.shop.cart.http
 
 import cats.effect.IO
-import com.shop.config.Implicits.moneyContext
-import com.shop.generators._
-import com.shop.http.error.PricesClientError
-import com.shop.model.product.ProductName
+import com.shop.cart.config.Implicits.moneyContext
+import com.shop.cart.generators._
+import com.shop.cart.http.error.PricesClientError
+import com.shop.cart.model.product.ProductName
 import eu.timepit.refined.auto._
 import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
 import org.http4s.client.Client

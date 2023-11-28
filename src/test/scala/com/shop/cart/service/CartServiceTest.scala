@@ -1,19 +1,18 @@
-package com.shop
-package service
+package com.shop.cart.service
 
 import cats.effect.IO
 import cats.implicits._
-import com.shop.TestData._
-import com.shop.config.Config.{CartConfig, taxRate}
-import com.shop.config.Implicits.{moneyConfig, moneyContext}
-import com.shop.generators._
-import com.shop.http.PricesClient
-import com.shop.http.error.PricesClientError
-import com.shop.model.cart._
-import com.shop.model.product.{ProductName, ShoppingProduct}
-import com.shop.model.tax.Tax
-import com.shop.repo.CartRepo
-import com.shop.repo.error.CartNotFound
+import com.shop.cart.TestData._
+import com.shop.cart.config.Config.{CartConfig, taxRate}
+import com.shop.cart.config.Implicits.{moneyConfig, moneyContext}
+import com.shop.cart.generators._
+import com.shop.cart.http.PricesClient
+import com.shop.cart.http.error.PricesClientError
+import com.shop.cart.model.cart._
+import com.shop.cart.model.product.{ProductName, ShoppingProduct}
+import com.shop.cart.model.tax.Tax
+import com.shop.cart.repo.CartRepo
+import com.shop.cart.repo.error.CartNotFound
 import eu.timepit.refined.auto._
 import munit.{CatsEffectSuite, ScalaCheckEffectSuite}
 import org.scalacheck.effect.PropF.forAllF

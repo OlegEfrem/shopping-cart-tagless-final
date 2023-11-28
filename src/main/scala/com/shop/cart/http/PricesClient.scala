@@ -1,11 +1,10 @@
-package com.shop
-package http
+package com.shop.cart.http
 
 import cats.effect.MonadCancelThrow
 import cats.implicits._
-import com.shop.config.Implicits.moneyContext
-import com.shop.http.error.PricesClientError
-import com.shop.model.product.ProductName
+import com.shop.cart.config.Implicits.moneyContext
+import com.shop.cart.http.error.PricesClientError
+import com.shop.cart.model.product.ProductName
 import derevo.cats.{eqv, show}
 import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive

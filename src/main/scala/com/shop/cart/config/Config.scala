@@ -1,6 +1,6 @@
-package com.shop.config
+package com.shop.cart.config
 
-import com.shop.model.tax.TaxRate
+import com.shop.cart.model.tax.TaxRate
 import squants.market.{Currency, GBP}
 
 import scala.math.BigDecimal.RoundingMode
