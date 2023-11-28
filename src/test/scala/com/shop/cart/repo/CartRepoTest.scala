@@ -103,7 +103,7 @@ class CartRepoTest extends CatsEffectSuite with ScalaCheckEffectSuite {
     }
   }
 
-  test("Creates an empty cart, replaces it with non empty & gets non empty cart") {
+  test("Creates an empty cart, replaces it with a non empty one & gets the non empty cart") {
     forAllF { (cart: Cart) =>
       def nonEmptyCart(id: CartId) = cart.copy(id = id)
       for {

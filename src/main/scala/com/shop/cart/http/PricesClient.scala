@@ -47,8 +47,7 @@ object PricesClient {
               case st =>
                 val msg = Option(st.reason).getOrElse("unknown")
                 val errorMsg = s"${request.method} ${request.uri} HTTP error, code:${st.code}, reason: $msg"
-                PricesClientError(productName, errorMsg)
-                  .raiseError[F, Money]
+                PricesClientError(productName, errorMsg).raiseError[F, Money]
             }
           }
         }

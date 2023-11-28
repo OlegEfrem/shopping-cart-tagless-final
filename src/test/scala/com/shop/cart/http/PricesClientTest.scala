@@ -39,7 +39,7 @@ class PricesClientTest extends CatsEffectSuite with ScalaCheckEffectSuite {
   test("HTTP-404 response") {
     forAllF { (productName: ProductName) =>
       val client = Client.fromHttpApp(routes(s"${productName.value}", NotFound()))
-      val expectedError = PricesClientError(productName, s"GET http://localhost/${productName.value}.json HTTP error, code:404, reason: Not Found")
+      val expectedError = PricesClientError(productName, s"GET $url${productName.value}.json HTTP error, code:404, reason: Not Found")
       PricesClient
         .make[IO](client, PricesClientConfig(url))
         .getPrice(productName)
