@@ -61,10 +61,10 @@ object CartService {
     }
 
     private def calculateTotals(items: List[Item]): CartTotals = {
-      val subTotal = items.foldLeft(MoneyOps.zero) { case (acc, item) => acc |+| item.product.price * item.quantity.value.value }
-      val taxAmount = subTotal * cartConfig.taxRate.value
-      val total = subTotal + taxAmount
-      CartTotals(subTotal, Tax(cartConfig.taxRate, taxAmount), total)
+      val subtotal = items.foldLeft(MoneyOps.zero) { case (acc, item) => acc |+| item.product.price * item.quantity.value.value }
+      val taxAmount = subtotal * cartConfig.taxRate.value
+      val total = subtotal + taxAmount
+      CartTotals(subtotal, Tax(cartConfig.taxRate, taxAmount), total)
     }
   }
 }
